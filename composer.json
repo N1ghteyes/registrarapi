@@ -1,0 +1,22 @@
+{
+  "name": "n1ghteyes/registrarapi",
+  "description": "A php class wrapper for various domain providers apis. Provides a centralised and consistant entry point for multiple providers",
+  "type": "library",
+  "require": {
+    "php": ">=5.6.0",
+    "guzzlehttp/guzzle": "^6.3"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Toby New",
+      "email": "toby.new@source-control.co.uk"
+    }
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "registrarapi\\": "src/"
+    }
+  }
+}
