@@ -21,11 +21,6 @@ abstract class registrarapi {
 
   public function __get($name){
     switch(strtolower($name)){
-      case 'enom':
-        $this->service  = '';
-        break;
-      case 'ghandi':
-        break;
       case 'xml':
         $this->responseFormat = 'xml';
         break;
@@ -85,32 +80,8 @@ abstract class registrarapi {
   {
     $client = new GuzzleHttp\Client();
     $res = $client->request('GET', $url);
-    /*
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_setopt($ch, CURLOPT_SSLVERSION, 5);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 100020);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 5 > 0);
-    curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 
-    $content = curl_exec($ch);
-    $err = curl_errno($ch);
-    $errmsg = curl_error($ch);
-    $header = curl_getinfo($ch);
-
-    curl_close($ch);
-
-    $header['errno'] = $err;
-    $header['errmsg'] = $errmsg;
-    $header['content'] = $content;*/
-
-    $header['errno'] = $res->getStatusCode();
-    //$header['errmsg'] = $errmsg;
+    $header['status'] = $res->getStatusCode();
     $header['content'] = $res->getBody();
 
     return $header;
