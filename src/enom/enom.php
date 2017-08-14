@@ -30,4 +30,9 @@ class enom extends registrarapi {
     }
     return $url;
   }
+
+  protected function _formatResponse($response){
+    //@todo format the response
+    return $response;
+  }
 }

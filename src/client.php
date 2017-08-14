@@ -37,7 +37,8 @@ class Client{
    */
   public function __call($name, $arguments)
   {
-    return $this->providerObject->{$name}($arguments[0]);
+    $args = isset($arguments[0]) && !empty($arguments[0]) ? $arguments[0] : null;
+    return $this->providerObject->{$name}($args);
   }
 
   /**

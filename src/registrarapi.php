@@ -1,15 +1,17 @@
 <?php
+
 namespace registrarapi;
 
 use GuzzleHttp;
+use registrarapi\utilities\response\Response;
 
-abstract class registrarapi {
+abstract class registrarapi
+{
 
+  protected $responseFormat;
   private $lastrequesturl;
   private $error;
   private $response;
-
-  protected $responseFormat;
 
   /**
    * Construct based purely on defaults
@@ -19,8 +21,9 @@ abstract class registrarapi {
 
   }
 
-  public function __get($name){
-    switch(strtolower($name)){
+  public function __get($name)
+  {
+    switch (strtolower($name)) {
       case 'xml':
         $this->responseFormat = 'xml';
         break;
@@ -30,7 +33,8 @@ abstract class registrarapi {
     }
   }
 
-  public function get_lastrequest(){
+  public function get_lastrequest()
+  {
     return $this->lastrequesturl;
   }
 
@@ -40,18 +44,27 @@ abstract class registrarapi {
    * @param array $arguments an array of arguments
    * @return mixed
    */
-  public function  __call($name, $arguments)
+  public function __call($name, $arguments)
   {
     if (count($arguments) < 1 || !is_array($arguments[0])) {
       $arguments[0] = array();
     }
-    $response = $this->APIcall($name, $arguments[0]);
+    $rawResponse = $this->APIcall($name, $arguments[0]);
     //return formatted xml, or decoded json.
-    return $this->responseFormat == 'xml' ? simplexml_load_string($response) : GuzzleHttp\json_decode($response);
+    $decodedResponse = $this->responseFormat == 'xml' ? simplexml_load_string($rawResponse) : GuzzleHttp\json_decode($rawResponse);
+    $formattedResponse = $this->_formatResponse($decodedResponse);
+    return $this->response($formattedResponse);
   }
 
-  abstract protected function buildRequest($name, $arguments);
-  abstract function setRequestType($format);
+  /**
+   * Force any extended classes to return a response object
+   * @param Response $response
+   * @return Response
+   */
+  private function response(Response $response){
+    return $response;
+  }
+
   /**
    * @param $name
    * @param $arguments
@@ -66,15 +79,7 @@ abstract class registrarapi {
     return $this->response['content'];
   }
 
-  private function setError(){
-    $this->error = array();
-    $this->error['errno'] = $this->response['errno'];
-    $this->error['errmsg'] = $this->response['errmsg'];
-  }
-
-  public function lastError(){
-    return $this->error;
-  }
+  abstract protected function buildRequest($name, $arguments);
 
   protected function curl_request($url)
   {
@@ -82,8 +87,24 @@ abstract class registrarapi {
     $res = $client->request('GET', $url);
 
     $header['status'] = $res->getStatusCode();
-    $header['content'] = $res->getBody();
+    $header['content'] = $res->getBody()->getContents();
 
     return $header;
+  }
+
+  private function setError()
+  {
+    $this->error = array();
+    $this->error['errno'] = $this->response['status'];
+    //$this->error['errmsg'] = $this->response['errmsg'];
+  }
+
+  abstract protected function _formatResponse($decodedResponse);
+
+  abstract function setRequestType($format);
+
+  public function lastError()
+  {
+    return $this->error;
   }
 }
