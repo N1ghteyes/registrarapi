@@ -52,8 +52,7 @@ abstract class registrarapi
     $rawResponse = $this->APIcall($name, $arguments[0]);
     //return formatted xml, or decoded json.
     $decodedResponse = $this->responseFormat == 'xml' ? simplexml_load_string($rawResponse) : GuzzleHttp\json_decode($rawResponse);
-    $formattedResponse = $this->_formatResponse($decodedResponse);
-    return $this->response($formattedResponse);
+    return $this->response($this->_formatResponse($decodedResponse));
   }
 
   /**
